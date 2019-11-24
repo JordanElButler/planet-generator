@@ -49,7 +49,7 @@
             </h1>
         </div>
         <div class="text-block">
-                <p>An example of a classic method for generating planets. Start with a mesh and choose a random normal vector, for all vertices of the mesh scale by some amount based on which side of the plane defined by the normal the given vertex falls on. Repeat and color by vertex height. One issue with this method is that it creates a planet with an anti-symmetry between antipodes.
+                <p>An example of a classic method for generating planets. Start with a mesh and choose a random normal vector, for all vertices of the mesh scale by some amount based on which side of the plane defined by the normal the given vertex falls on. Repeat and color by vertex height. One drawback with this method is that it creates a planet with an anti-symmetry between antipodes.
                 </p>
             </div>
     </div>
@@ -68,7 +68,6 @@
     </div>
 
     <script src="three.js"></script>
-    <script src="planets.js"></script>
     <script>
         var vs = `
             varying float depth;
@@ -169,8 +168,11 @@
         function animate() {
             window.requestAnimationFrame(animate);
             renderer.render(scene, camera);
-            planet.rotation.x += 0.001;
-            planet.rotation.y += 0.001;
+            if (!mouseState.dragging) {
+                planet.rotation.x += 0.001;
+                planet.rotation.y += 0.001;
+            }
+
 
             
         }
@@ -184,7 +186,7 @@
         renderer.domElement.addEventListener('mousedown', function() {
             mouseState.dragging = true;
         });
-        renderer.domElement.addEventListener('mouseup', function() {
+        window.addEventListener('mouseup', function() {
             mouseState.dragging = false;
         });
         renderer.domElement.addEventListener('mousemove', function(e) {
@@ -194,6 +196,14 @@
             let m = getElementMouseCoordinates(this, e);
             mouseState.mouseX = m.x;
             mouseState.mouseY = m.y;
+
+            if (mouseState.dragging) {
+                let YRotValue = (mouseState.mouseX - mouseState.pmouseX) / renderer.domElement.width * 2 * Math.PI;
+                let XRotValue = (mouseState.mouseY - mouseState.pmouseY) / renderer.domElement.height * 2 * Math.PI;
+
+                planet.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), YRotValue);
+                planet.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), XRotValue);
+            }
         });
 
         resizeRenderArea();
