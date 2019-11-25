@@ -190,6 +190,24 @@
         window.addEventListener('mouseup', function() {
             mouseState.dragging = false;
         });
+        renderer.domElement.addEventListener('touchmove', function(e) {
+            mouseState.pmouseX = mouseState.mouseX;
+            mouseState.pmouseY = mouseState.mouseY;
+
+            let m = getElementMouseCoordinates(this, e.touches[0]);
+
+            mouseState.mouseX = m.x;
+            mouseState.mouseY = m.y;
+
+            let YRotValue = (mouseState.mouseX - mouseState.pmouseX) / renderer.domElement.width * 2 * Math.PI;
+            let XRotValue = (mouseState.mouseY - mouseState.pmouseY) / renderer.domElement.height * 2 * Math.PI;
+
+            planet.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), YRotValue);
+            planet.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), XRotValue);
+
+            e.preventDefault();
+        
+        });
         renderer.domElement.addEventListener('mousemove', function(e) {
             mouseState.pmouseX = mouseState.mouseX;
             mouseState.pmouseY = mouseState.mouseY;
